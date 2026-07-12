@@ -1,0 +1,88 @@
+{
+  "summary": {
+    "answer_rouge_l": 0.102,
+    "answer_similarity": 0.3899,
+    "context_relevance": 0.3749,
+    "groundedness": 0.4272,
+    "n_examples": 5,
+    "retrieval_mrr": 0.04,
+    "retrieval_hit_rate": 0.2
+  },
+  "examples": [
+    {
+      "subset": "delucionqa",
+      "question": "What if I fail to latch the tailgate properly?",
+      "answer": "/or cargo will occur",
+      "reference_answer": "If you fail to securely latch the tailgate properly, it could result in damage to the vehicle or cargo.",
+      "metrics": {
+        "retrieval_hit": 1.0,
+        "retrieval_rr": 0.2,
+        "context_relevance": 0.5318992733955383,
+        "groundedness": 0.2825963795185089,
+        "answer_similarity": 0.3260817527770996,
+        "answer_rouge_l": 0.17391304347826086
+      },
+      "latency_s": 1.67
+    },
+    {
+      "subset": "delucionqa",
+      "question": "What kind of safety features are implemented in this car?",
+      "answer": "Restraint systems",
+      "reference_answer": "The car has occupant restraint systems as its main safety feature. It also has safety settings accessible through the Safety/Driving Assistance button on the touchscreen, which may vary depending on the features equipped on the vehicle.",
+      "metrics": {
+        "retrieval_hit": 0.0,
+        "retrieval_rr": 0.0,
+        "context_relevance": 0.4280714988708496,
+        "groundedness": 0.4436344504356384,
+        "answer_similarity": 0.5650695562362671,
+        "answer_rouge_l": 0.10256410256410257
+      },
+      "latency_s": 1.36
+    },
+    {
+      "subset": "delucionqa",
+      "question": "When will the Automatic SOS be triggered?",
+      "answer": "When the vehicle is started",
+      "reference_answer": "The Automatic SOS will be triggered in the event that your vehicle's airbags deploy.",
+      "metrics": {
+        "retrieval_hit": 0.0,
+        "retrieval_rr": 0.0,
+        "context_relevance": 0.3680586814880371,
+        "groundedness": 0.4802371561527252,
+        "answer_similarity": 0.404821515083313,
+        "answer_rouge_l": 0.2
+      },
+      "latency_s": 1.43
+    },
+    {
+      "subset": "delucionqa",
+      "question": "What happens if I accidentally push the SOS Call button?",
+      "answer": "Ignoring the Rearview Mirror light",
+      "reference_answer": "If you accidentally push the SOS Call button, you have 10 seconds to cancel the call by either pushing the SOS Call button again or pressing the Cancel button on the in-vehicle touchscreen. If the call is not canceled within 10 seconds, the SOS Call system will initiate a call to an SOS operator.",
+      "metrics": {
+        "retrieval_hit": 0.0,
+        "retrieval_rr": 0.0,
+        "context_relevance": 0.33721980452537537,
+        "groundedness": 0.5074567794799805,
+        "answer_similarity": 0.30685684084892273,
+        "answer_rouge_l": 0.03333333333333333
+      },
+      "latency_s": 1.77
+    },
+    {
+      "subset": "delucionqa",
+      "question": "What is the DEF?",
+      "answer": "Federal Motor Vehicle Safety Standard",
+      "reference_answer": "The DEF stands for Diesel Exhaust Fluid.",
+      "metrics": {
+        "retrieval_hit": 0.0,
+        "retrieval_rr": 0.0,
+        "context_relevance": 0.20912399888038635,
+        "groundedness": 0.4219093322753906,
+        "answer_similarity": 0.3465140163898468,
+        "answer_rouge_l": 0.0
+      },
+      "latency_s": 1.1
+    }
+  ]
+}

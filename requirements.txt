@@ -1,0 +1,11 @@
+torch>=2.9
+transformers>=4.44
+sentence-transformers>=3.0
+datasets>=2.20
+chromadb>=0.5
+langchain-text-splitters>=0.2
+groq>=0.9
+fastapi>=0.110
+uvicorn>=0.29
+streamlit>=1.57
+numpy>=1.26
