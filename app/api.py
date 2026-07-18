@@ -11,6 +11,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from src.config import DOMAIN_SUBSETS, get_config
@@ -21,6 +23,14 @@ app = FastAPI(
     description="Retrieval-Augmented Generation over the five RAGBench domains: "
                 "customer_support, biomedical, general_knowledge, legal, finance.",
     version="2.0.0",
+)
+
+# allow the React dev server (npm run dev) to call the API
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 _pipelines: dict[str, RAGPipeline] = {}
@@ -75,3 +85,10 @@ def ask(req: AskRequest):
     result = get_pipeline(req.domain).answer(
         req.question, top_n=req.top_n, rerank=req.rerank)
     return result
+
+
+# serve the built React UI (frontend/dist) at / when it exists;
+# API routes above keep precedence over the static mount
+_dist = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+if _dist.is_dir():
+    app.mount("/", StaticFiles(directory=str(_dist), html=True), name="ui")

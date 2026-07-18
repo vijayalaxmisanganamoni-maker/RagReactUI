@@ -1,0 +1,136 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0e1117;
+  --panel: #1a1d24;
+  --panel-2: #262730;
+  --border: #3d4048;
+  --text: #fafafa;
+  --muted: #a3a8b4;
+  --red: #ff4b4b;
+  --red-dim: #2e1215;
+}
+
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+
+.app { display: flex; flex-direction: column; height: 100vh; }
+
+header {
+  background: var(--bg);
+  color: var(--text);
+  padding: 16px 22px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.brand { text-align: center; }
+.brand h1 { font-size: 1.2rem; }
+.subtitle { font-size: .78rem; color: var(--muted); }
+
+.tabs { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; justify-content: center; }
+.tab {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 18px;
+  font-size: .88rem;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.tab:hover { border-color: var(--muted); }
+.tab.active {
+  background: var(--red-dim);
+  color: var(--red);
+  border-color: var(--red);
+  font-weight: 600;
+}
+
+.body { display: flex; flex: 1; overflow: hidden; }
+
+.sidebar {
+  width: 300px;
+  min-width: 240px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  overflow-y: auto;
+}
+.sidebar h2 { font-size: .95rem; margin-bottom: 4px; }
+.sidebar .hint { font-size: .8rem; color: var(--muted); margin-bottom: 14px; }
+
+.chat { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+main { flex: 1; overflow-y: auto; padding: 22px; max-width: 900px; width: 100%; margin: 0 auto; }
+
+.empty { text-align: center; margin-top: 8vh; color: var(--muted); }
+.chip {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: .85rem;
+  cursor: pointer;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+.chip:hover { border-color: var(--red); color: var(--red); }
+
+@media (max-width: 720px) {
+  .body { flex-direction: column; }
+  .sidebar { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid var(--border); }
+}
+
+.msg { display: flex; margin-bottom: 14px; }
+.msg.user { justify-content: flex-end; }
+.bubble {
+  max-width: 78%;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  font-size: .93rem;
+  line-height: 1.5;
+}
+.msg.user .bubble { background: var(--red-dim); border-color: var(--red); border-bottom-right-radius: 4px; }
+.msg.assistant .bubble { border-bottom-left-radius: 4px; }
+.msg.error .bubble { background: #2a1215; color: #ff8a8a; border-color: #a33; }
+.content { white-space: pre-wrap; }
+
+.typing { color: var(--muted); font-style: italic; }
+.meta { display: block; margin-top: 8px; font-size: .72rem; color: var(--muted); }
+
+.sources { margin-top: 10px; font-size: .82rem; }
+.sources summary { cursor: pointer; color: var(--red); font-weight: 600; }
+.source { margin: 8px 0; padding: 8px 10px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; }
+.source-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+.badge { font-weight: 600; color: var(--text); }
+.scores { color: var(--muted); font-size: .75rem; }
+.source p { color: var(--muted); }
+
+footer { background: var(--bg); border-top: 1px solid var(--border); padding: 14px 22px; }
+footer form { display: flex; gap: 10px; max-width: 900px; margin: 0 auto; }
+footer input {
+  flex: 1;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 24px;
+  font-size: .95rem;
+  outline: none;
+}
+footer input::placeholder { color: var(--muted); }
+footer input:focus { border-color: var(--red); }
+footer button {
+  background: var(--red);
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 0 26px;
+  font-size: .95rem;
+  cursor: pointer;
+}
+footer button:disabled { opacity: .4; cursor: default; }
+footer button:not(:disabled):hover { background: #e03e3e; }
