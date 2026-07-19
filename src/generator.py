@@ -1,7 +1,7 @@
 """Answer generation.
 
 Two providers:
-  - "groq":  Llama 3.3 70B via the Groq API (needs GROQ_API_KEY) - best quality
+  - "groq":  Llama 3.1 8B Instant via the Groq API (needs GROQ_API_KEY) - best quality
   - "local": google/flan-t5-base via transformers - runs on CPU, no API key
 "auto" picks groq when a key is available, otherwise local.
 """

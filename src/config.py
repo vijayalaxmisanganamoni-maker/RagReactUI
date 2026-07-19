@@ -72,10 +72,16 @@ class Config:
     llm_provider: str = field(
         default_factory=lambda: os.getenv("RAG_LLM_PROVIDER", "auto"))
     groq_model: str = field(
-        default_factory=lambda: os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile"))
-    local_model: str = "google/flan-t5-base"
+        default_factory=lambda: os.getenv("GROQ_MODEL", "llama-3.1-8b-instant"))
+    # local_model: str = "google/flan-t5-base"
     max_new_tokens: int = 512
     temperature: float = 0.1
+
+    # ---- evaluation ----
+    # LLM judge for TRACe metrics (scripts/run_eval.py --judge); a stronger
+    # model than the generator so its judgments are trustworthy
+    judge_model: str = field(
+        default_factory=lambda: os.getenv("GROQ_JUDGE_MODEL", "llama-3.3-70b-versatile"))
 
     def __post_init__(self):
         if self.domain not in DOMAIN_SUBSETS:

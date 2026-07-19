@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.config import get_config
 from src.data_loader import load_eval_examples
-from src.evaluation import RAGEvaluator
+from src.evaluation import RAGEvaluator, rmse
 from src.pipeline import RAGPipeline
 
 OUT_DIR = Path(__file__).resolve().parent.parent
@@ -28,6 +28,9 @@ def main():
     # their gold documents in the corpus (pass --split test to override)
     parser.add_argument("--split", type=str, default="train")
     parser.add_argument("--n", type=int, default=10, help="questions per subset")
+    parser.add_argument("--judge", action="store_true",
+                        help="also score each example with the LLM judge "
+                             "(TRACe metrics via Groq, needs GROQ_API_KEY)")
     args = parser.parse_args()
 
     cfg = get_config(args.domain)
@@ -39,6 +42,11 @@ def main():
 
     pipeline = RAGPipeline(cfg)
     evaluator = RAGEvaluator(cfg)
+    judge = None
+    if args.judge:
+        from src.judge import LLMJudge
+        judge = LLMJudge(cfg)
+        print(f"LLM judge enabled ({cfg.judge_model})")
 
     per_example, records = [], []
     for i, ex in enumerate(examples, 1):
@@ -50,21 +58,63 @@ def main():
             reference_answer=ex["reference_answer"],
             gold_doc_ids=ex["gold_doc_ids"],
         )
-        per_example.append(metrics)
-        records.append({
+        record = {
             "subset": ex["subset"],
             "question": ex["question"],
             "answer": result["answer"],
             "reference_answer": ex["reference_answer"],
             "metrics": metrics,
+            "annotations": ex["annotations"],
             "latency_s": result["latency_s"],
-        })
-        print(f"[{i}/{len(examples)}] hit={metrics['retrieval_hit']:.0f} "
-              f"grounded={metrics['groundedness']:.2f} "
-              f"rougeL={metrics.get('answer_rouge_l', 0):.2f} "
-              f"({result['latency_s']}s) {ex['question'][:60]}")
+        }
+        if judge:
+            try:
+                judged = judge.judge(
+                    ex["question"],
+                    [c["text"] for c in result["contexts"] if c.get("text")],
+                    result["answer"],
+                )
+                metrics.update(judged["metrics"])
+                record["judgment"] = judged["judgment"]
+            except Exception as e:
+                print(f"  ! judge failed on example {i}: {e}")
+        per_example.append(metrics)
+        records.append(record)
+        line = (f"[{i}/{len(examples)}] hit={metrics['retrieval_hit']:.0f} "
+                f"grounded={metrics['groundedness']:.2f} "
+                f"rougeL={metrics.get('answer_rouge_l', 0):.2f}")
+        if "judge_adherence" in metrics:
+            line += f" adherent={metrics['judge_adherence']:.0f}"
+        print(f"{line} ({result['latency_s']}s) {ex['question'][:60]}")
 
     summary = evaluator.aggregate(per_example)
+
+    # RMSE of our predicted scores vs RAGBench TRACe annotations; rmse()
+    # drops examples where the annotation is missing (None/NaN)
+    annotations = [ex["annotations"] for ex in examples]
+    trace_rmse = {
+        "rmse_context_relevance": rmse(
+            [a["relevance_score"] for a in annotations],
+            [m.get("context_relevance") for m in per_example],
+        ),
+        "rmse_adherence": rmse(
+            [a["adherence_score"] for a in annotations],
+            [m.get("groundedness") for m in per_example],
+        ),
+    }
+    if judge:
+        # judge predictions vs the same annotations (note: annotations score
+        # RAGBench's gold documents, the judge scores our retrieved chunks)
+        for name, ann_key in [("relevance", "relevance_score"),
+                              ("utilization", "utilization_score"),
+                              ("completeness", "completeness_score"),
+                              ("adherence", "adherence_score")]:
+            trace_rmse[f"rmse_judge_{name}"] = rmse(
+                [a[ann_key] for a in annotations],
+                [m.get(f"judge_{name}") for m in per_example],
+            )
+    summary.update({k: round(v, 4) for k, v in trace_rmse.items() if v is not None})
+
     print("\n===== Aggregate metrics =====")
     for k, v in summary.items():
         print(f"  {k:22s}: {v}")

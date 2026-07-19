@@ -19,7 +19,7 @@ def chunk_document(splitter: RecursiveCharacterTextSplitter, doc: dict) -> list[
     chunks = []
     for i, piece in enumerate(splitter.split_text(doc["text"])):
         piece = piece.strip()
-        if len(piece) < 30:  # drop tiny fragments
+        if len(piece) < 150:  # drop tiny fragments
             continue
         # id by chunk TEXT hash: identical boilerplate appearing in many docs
         # (e.g. legal disclaimers) collapses to one entry instead of

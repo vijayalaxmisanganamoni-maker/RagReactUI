@@ -8,6 +8,8 @@ Implemented without an LLM judge so evaluation is free and reproducible:
                          to a retrieved chunk (proxy for answer faithfulness)
   - answer_similarity  : embedding cosine similarity(answer, reference answer)
   - answer_rouge_l     : ROUGE-L F1 vs the reference answer
+  - rmse               : RMSE between predicted scores and RAGBench TRACe
+                         annotations, skipping missing (None/NaN) values
 """
 import re
 
@@ -31,6 +33,22 @@ def _lcs(a: list[str], b: list[str]) -> int:
             dp[j] = prev + 1 if a[i - 1] == b[j - 1] else max(dp[j], dp[j - 1])
             prev = cur
     return dp[len(b)]
+
+
+def rmse(y_true: list, y_pred: list) -> float | None:
+    """Root Mean Squared Error over pairs where both values are present.
+
+    RAGBench annotations are sparse (e.g. adherence_score is often None), so
+    a pair is dropped when either side is None or NaN; returns None when no
+    complete pair remains. Booleans (adherence) are cast to 0.0/1.0.
+    """
+    t = np.array([np.nan if v is None else float(v) for v in y_true], dtype=float)
+    p = np.array([np.nan if v is None else float(v) for v in y_pred], dtype=float)
+    mask = ~(np.isnan(t) | np.isnan(p))
+    if not mask.any():
+        return None
+    diff = t[mask] - p[mask]
+    return float(np.sqrt(np.mean(diff * diff)))
 
 
 def rouge_l_f1(candidate: str, reference: str) -> float:

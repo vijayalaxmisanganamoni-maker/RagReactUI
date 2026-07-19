@@ -79,12 +79,17 @@ uvicorn app.api:app --reload
 
 # 5. Evaluation on the RAGBench test split
 python scripts/run_eval.py --n 20
+
+# 6. Evaluation with the LLM judge (TRACe metrics, needs GROQ_API_KEY)
+python scripts/run_eval.py --n 20 --judge
 ```
 
 ## Evaluation metrics
 
-`scripts/run_eval.py` reports, per question and aggregated
-(inspired by RAGBench's TRACe framework, computed without an LLM judge):
+`scripts/run_eval.py` reports, per question and aggregated, two families of
+metrics inspired by RAGBench's TRACe framework.
+
+Judge-free (cheap, reproducible, always computed):
 
 - **retrieval_hit_rate / retrieval_mrr** — is a gold document among the
   retrieved chunks, and how high is it ranked
@@ -94,4 +99,18 @@ python scripts/run_eval.py --n 20
 - **answer_similarity / answer_rouge_l** — agreement with the RAGBench
   reference answer
 
-Results are saved to `eval_results.json` for the technical report.
+LLM judge (`--judge`, uses `llama-3.3-70b-versatile` on Groq — override with
+`GROQ_JUDGE_MODEL`): the judge sees the question, the retrieved context and
+the answer with sentence keys ('0a', '0b' / 'a', 'b') and returns a
+structured judgment (RAGBench's judge prompt), from which the four TRACe
+metrics are derived:
+
+- **judge_relevance** — fraction of context sentences relevant to the question
+- **judge_utilization** — fraction of context sentences used in the answer
+- **judge_completeness** — fraction of relevant sentences that were used
+- **judge_adherence** — 1 iff every answer sentence is fully supported
+
+Both families are compared against RAGBench's human/GPT-4 TRACe annotations
+via `rmse_*` entries in the summary.
+
+Results are saved to `eval_results_<domain>.json` for the technical report.
