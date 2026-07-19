@@ -24,7 +24,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--domain", type=str, default="customer_support")
     parser.add_argument("--subsets", type=str, default=None)
-    parser.add_argument("--split", type=str, default="test")
+    # default to train: with a train-only index, only train questions have
+    # their gold documents in the corpus (pass --split test to override)
+    parser.add_argument("--split", type=str, default="train")
     parser.add_argument("--n", type=int, default=10, help="questions per subset")
     args = parser.parse_args()
 

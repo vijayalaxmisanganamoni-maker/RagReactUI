@@ -51,7 +51,7 @@ class Config:
     # ---- data ----
     hf_dataset: str = "rungalileo/ragbench"
     subsets: list | None = None          # derived from domain unless overridden
-    index_split: str = "all"
+    index_split: str = "train"
 
     # ---- chunking ----
     chunk_size: int = 1000               # characters
